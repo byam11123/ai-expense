@@ -31,7 +31,7 @@ export default function ExpenseTable({ expenses, onRemoveExpense, onUpdateExpens
   const handleUpdateExpense = (updatedFormData: ExpenseFormData) => {
     if (editData) {
       onUpdateExpense(editData.id, {
-        ...editData, // Keep existing id and date
+        ...editData, // Keep existing id, date, createdAt, updatedAt
         total: updatedFormData.total,
         currency: updatedFormData.currency,
         category: updatedFormData.category,
@@ -50,6 +50,16 @@ export default function ExpenseTable({ expenses, onRemoveExpense, onUpdateExpens
       minimumFractionDigits: 2
     });
     return formatter.format(amount);
+  };
+
+  const formatDate = (date: Date | string | undefined) => {
+    if (!date) {
+      return '';
+    }
+    if (typeof date === 'string') {
+      return new Date(date).toLocaleDateString();
+    }
+    return date.toLocaleDateString();
   };
 
   // Group expenses by category for summary
@@ -109,7 +119,7 @@ export default function ExpenseTable({ expenses, onRemoveExpense, onUpdateExpens
                           </span>
                         </TableCell>
                         <TableCell>
-                          {expense.billingDate ? (expense.billingDate instanceof Date ? expense.billingDate.toLocaleDateString() : typeof expense.billingDate === 'string' ? new Date(expense.billingDate).toLocaleDateString() : new Date(expense.date).toLocaleDateString()) : new Date(expense.date).toLocaleDateString()}
+                          {expense.billingDate ? formatDate(expense.billingDate) : formatDate(expense.date)}
                         </TableCell>
                         <TableCell className="text-right space-x-2">
                           <Button variant="ghost" size="icon" onClick={() => startEditing(expense)}>

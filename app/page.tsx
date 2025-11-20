@@ -9,53 +9,94 @@ import { Expense, ExpenseFormData } from '@/types/expense';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
+import { fetchAllExpenses, insertExpense, updateExpense, deleteExpense } from '@/lib/supabaseOperations';
 
 export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+
+  // Load expenses from Supabase on component mount
+  useEffect(() => {
+    const loadExpenses = async () => {
+      try {
+        setLoadingInitial(true);
+        const fetchedExpenses = await fetchAllExpenses();
+        setExpenses(fetchedExpenses);
+      } catch (error) {
+        console.error('Error loading expenses:', error);
+        // You might want to show an error message to the user
+      } finally {
+        setLoadingInitial(false);
+      }
+    };
+
+    loadExpenses();
+  }, []);
 
   // Function to handle expense extraction from image
-  const handleExtractionComplete = (expenseData: ExpenseFormData) => {
-    const newExpense: Expense = {
-      id: Date.now().toString(),
-      total: expenseData.total,
-      currency: expenseData.currency,
-      category: expenseData.category,
-      vendor: expenseData.vendor,
-      date: new Date(), // Date when added to the system
-      billingDate: expenseData.billingDate || undefined // Use extracted billing date or undefined
-    };
-    
-    setExpenses(prev => [newExpense, ...prev]);
+  const handleExtractionComplete = async (expenseData: ExpenseFormData) => {
+    try {
+      const newExpense = await insertExpense(expenseData);
+      setExpenses(prev => [newExpense, ...prev]);
+    } catch (error) {
+      console.error('Error saving extracted expense:', error);
+      // You might want to show an error message to the user
+    }
   };
 
   // Function to add a new expense manually
-  const handleAddExpense = (expenseData: ExpenseFormData) => {
-    const newExpense: Expense = {
-      id: Date.now().toString(),
-      total: expenseData.total,
-      currency: expenseData.currency,
-      category: expenseData.category,
-      vendor: expenseData.vendor,
-      date: new Date(), // Date when added to the system
-      billingDate: expenseData.billingDate || undefined // Use provided billing date or undefined
-    };
-    
-    setExpenses(prev => [newExpense, ...prev]);
+  const handleAddExpense = async (expenseData: ExpenseFormData) => {
+    try {
+      const newExpense = await insertExpense(expenseData);
+      setExpenses(prev => [newExpense, ...prev]);
+    } catch (error) {
+      console.error('Error saving manual expense:', error);
+      // You might want to show an error message to the user
+    }
   };
 
   // Function to remove an expense
-  const handleRemoveExpense = (id: string) => {
-    setExpenses(prev => prev.filter(expense => expense.id !== id));
+  const handleRemoveExpense = async (id: string) => {
+    try {
+      await deleteExpense(id);
+      setExpenses(prev => prev.filter(expense => expense.id !== id));
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      // You might want to show an error message to the user
+    }
   };
 
   // Function to update an expense
-  const handleUpdateExpense = (id: string, updatedExpense: Expense) => {
-    setExpenses(prev => 
-      prev.map(expense => expense.id === id ? updatedExpense : expense)
-    );
+  const handleUpdateExpense = async (id: string, updatedExpense: Expense) => {
+    try {
+      // Extract the form data from the updated expense
+      const expenseFormData: ExpenseFormData = {
+        total: updatedExpense.total,
+        currency: updatedExpense.currency,
+        category: updatedExpense.category,
+        vendor: updatedExpense.vendor,
+        billingDate: updatedExpense.billingDate
+      };
+
+      const updated = await updateExpense(id, expenseFormData);
+      setExpenses(prev =>
+        prev.map(expense => expense.id === id ? updated : expense)
+      );
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      // You might want to show an error message to the user
+    }
   };
 
+  if (loadingInitial) {
+    return (
+      <div className="flex min-h-screen w-full max-w-6xl flex-col items-center mx-auto px-4 py-8 justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="mt-4">Loading expenses...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full max-w-6xl flex-col items-center mx-auto px-4 py-8">
@@ -86,8 +127,8 @@ export default function Home() {
                     </AlertDescription>
                   </Alert>
                 )}
-                <UploadReceipt 
-                  onExtractionComplete={handleExtractionComplete} 
+                <UploadReceipt
+                  onExtractionComplete={handleExtractionComplete}
                   onLoadingChange={setLoading}
                 />
               </CardContent>
@@ -107,8 +148,8 @@ export default function Home() {
           {/* Right Column */}
           <div className="space-y-8">
             {/* Expenses Table */}
-            <ExpenseTable 
-              expenses={expenses} 
+            <ExpenseTable
+              expenses={expenses}
               onRemoveExpense={handleRemoveExpense}
               onUpdateExpense={handleUpdateExpense}
             />

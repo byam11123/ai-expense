@@ -8,8 +8,10 @@ export interface Expense {
   currency: string;
   category: string;
   vendor: string;
-  date: Date; // The date when the expense was added to the system
+  date: Date | string; // The date when the expense was added to the system
   billingDate?: DateOrString; // The actual billing date from the receipt
+  createdAt: Date | string; // Added for Supabase compatibility
+  updatedAt: Date | string; // Added for Supabase compatibility
 }
 
 export interface ExpenseFormData {

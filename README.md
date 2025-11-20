@@ -11,6 +11,7 @@ AI Expense Snap is an intelligent expense tracking application that leverages AI
 - Responsive design that works on all device sizes
 - Ability to delete and update expenses from the tracking table
 - Dark mode support
+- Supabase integration for persistent storage of expenses
 
 ## Tech Stack
 
@@ -75,10 +76,25 @@ ai-expense-snap/
 ## Environment Variables
 
 - `GOOGLE_API_KEY`: Your Google API key for accessing Gemini models (required)
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL (required for database functionality)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key (required for database functionality)
 
 ## API Integration
 
 The application uses Google's Gemini AI model to extract expense information from receipt images. The `extractExpenseData` function in `lib/geminiService.ts` handles the API communication and returns structured expense data.
+
+## Supabase Integration
+
+The application now integrates with Supabase for persistent storage. To set up the database:
+
+1. Create a Supabase project at [supabase.io](https://supabase.io)
+2. Set up the expenses table using the schema in `supabase/schema.sql`:
+   - Use the SQL file in this repository to create the `expenses` table
+   - Or run the SQL commands directly in the Supabase SQL editor
+3. Enable Row Level Security (RLS) if needed for your use case
+4. Add your Supabase URL and anon key to the environment variables
+
+The `lib/supabaseOperations.ts` file contains all the database operations for interacting with the expenses table.
 
 ## Contributing
 

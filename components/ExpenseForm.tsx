@@ -40,7 +40,7 @@ export default function ExpenseForm({ onAddExpense, initialData = null, onCancel
 
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'total' ? Number(value) : name === 'billingDate' ? value ? new Date(value) : undefined : value
+      [name]: name === 'total' ? Number(value) : name === 'billingDate' ? value || undefined : value
     }));
   };
 
@@ -136,7 +136,7 @@ export default function ExpenseForm({ onAddExpense, initialData = null, onCancel
             type="date"
             id="billingDate"
             name="billingDate"
-            value={formData.billingDate instanceof Date ? formData.billingDate.toISOString().split('T')[0] : typeof formData.billingDate === 'string' ? formData.billingDate : ''}
+            value={typeof formData.billingDate === 'string' ? formData.billingDate : formData.billingDate instanceof Date ? formData.billingDate.toISOString().split('T')[0] : ''}
             onChange={handleChange}
           />
         </div>
