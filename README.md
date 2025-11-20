@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Expense Snap
 
-## Getting Started
+AI Expense Snap is an intelligent expense tracking application that leverages AI to scan receipts and automatically extract expense information.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Image upload functionality with drag-and-drop support
+- AI-powered extraction using Google's `gemini-2.5-flash` model (extracts total, currency, category, vendor name, and billing date)
+- Manual expense entry form for adding expenses directly
+- Expense tracking table to view all expenses with billing dates
+- Responsive design that works on all device sizes
+- Ability to delete and update expenses from the tracking table
+- Dark mode support
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (with App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **AI Services**: Google Generative AI (Gemini)
+- **UI Components**: Lucide React icons
+- **Utilities**: Class Variance Authority, clsx, tailwind-merge
+
+## Setup Instructions
+
+1. **Clone the repository** (or create the project files as described)
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**:
+   Create a `.env.local` file in the project root with:
+   ```env
+   GOOGLE_API_KEY=your_google_api_key_here
+   ```
+
+4. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+   
+   The application will be available at http://localhost:3000
+
+## How to Use
+
+1. **Upload a receipt image** using the drag-and-drop interface or file selector
+2. **Click "Extract Expense Data"** to use AI to extract expense information
+3. **View the extracted information** in the expenses table
+4. **Add expenses manually** using the form if needed
+5. **Edit or delete expenses** directly from the table
+
+## Project Structure
+
+```
+ai-expense-snap/
+├── app/                    # Next.js App Router pages
+│   ├── layout.tsx          # Root layout with metadata
+│   ├── page.tsx            # Main application page
+│   └── globals.css         # Global styles
+├── components/             # Reusable React components
+│   ├── UploadReceipt.tsx   # Image upload component
+│   ├── ExpenseForm.tsx     # Manual expense entry form
+│   └── ExpenseTable.tsx    # Expense tracking table
+├── lib/                    # Utility functions
+│   ├── geminiService.ts    # Google Gemini API integration
+│   └── imageUtils.ts       # Image processing utilities
+├── types/                  # TypeScript type definitions
+│   └── expense.ts          # Expense-related type definitions
+├── public/                 # Static assets
+└── package.json            # Project dependencies and scripts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `GOOGLE_API_KEY`: Your Google API key for accessing Gemini models (required)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API Integration
 
-## Learn More
+The application uses Google's Gemini AI model to extract expense information from receipt images. The `extractExpenseData` function in `lib/geminiService.ts` handles the API communication and returns structured expense data.
 
-To learn more about Next.js, take a look at the following resources:
+## Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License.
