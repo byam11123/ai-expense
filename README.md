@@ -1,6 +1,6 @@
 # AI Expense Snap
 
-AI Expense Snap is an intelligent expense tracking application that leverages AI to scan receipts and automatically extract expense information.
+AI Expense Snap is an intelligent expense tracking application that leverages AI to scan receipts and automatically extract expense information with persistent storage using Supabase.
 
 ## Features
 
@@ -19,6 +19,7 @@ AI Expense Snap is an intelligent expense tracking application that leverages AI
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **AI Services**: Google Generative AI (Gemini)
+- **Database**: Supabase
 - **UI Components**: Lucide React icons
 - **Utilities**: Class Variance Authority, clsx, tailwind-merge
 
@@ -35,40 +36,58 @@ AI Expense Snap is an intelligent expense tracking application that leverages AI
    Create a `.env.local` file in the project root with:
    ```env
    GOOGLE_API_KEY=your_google_api_key_here
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-4. **Run the development server**:
+4. **Set up Supabase database**:
+   - Create a Supabase project at [supabase.com](https://supabase.com)
+   - Create the expenses table by copying the SQL from `supabase/supabase.txt` and running it in the Supabase SQL Editor
+   - (Optional for production) Enable Row Level Security (RLS) and set up appropriate policies
+
+5. **Run the development server**:
    ```bash
    npm run dev
    ```
-   
+
    The application will be available at http://localhost:3000
 
 ## How to Use
 
 1. **Upload a receipt image** using the drag-and-drop interface or file selector
 2. **Click "Extract Expense Data"** to use AI to extract expense information
-3. **View the extracted information** in the expenses table
+3. **View the extracted information** in the expenses table (automatically saved to Supabase)
 4. **Add expenses manually** using the form if needed
-5. **Edit or delete expenses** directly from the table
+5. **Edit or delete expenses** directly from the table (changes are saved to the database)
+6. **All data persists** across sessions due to Supabase integration
 
 ## Project Structure
 
 ```
 ai-expense-snap/
 ├── app/                    # Next.js App Router pages
+│   ├── api/                # API routes
+│   │   └── process-image/  # Image processing endpoint
 │   ├── layout.tsx          # Root layout with metadata
 │   ├── page.tsx            # Main application page
 │   └── globals.css         # Global styles
 ├── components/             # Reusable React components
+│   ├── ui/                 # UI-specific components
+│   │   └── theme-toggle.tsx # Theme toggle component
 │   ├── UploadReceipt.tsx   # Image upload component
 │   ├── ExpenseForm.tsx     # Manual expense entry form
 │   └── ExpenseTable.tsx    # Expense tracking table
 ├── lib/                    # Utility functions
 │   ├── geminiService.ts    # Google Gemini API integration
-│   └── imageUtils.ts       # Image processing utilities
+│   ├── imageUtils.ts       # Image processing utilities
+│   ├── supabase.ts         # Supabase client configuration
+│   ├── supabaseOperations.ts # Database operations for expenses
+│   └── dateUtils.ts        # Date formatting utilities
 ├── types/                  # TypeScript type definitions
 │   └── expense.ts          # Expense-related type definitions
+├── supabase/               # Supabase-related files
+│   ├── schema.sql          # Database schema for expenses table
+│   └── supabase.txt        # Clean SQL for copying to Supabase editor
 ├── public/                 # Static assets
 └── package.json            # Project dependencies and scripts
 ```
@@ -85,16 +104,12 @@ The application uses Google's Gemini AI model to extract expense information fro
 
 ## Supabase Integration
 
-The application now integrates with Supabase for persistent storage. To set up the database:
+The application now integrates with Supabase for persistent storage. The main features include:
 
-1. Create a Supabase project at [supabase.io](https://supabase.io)
-2. Set up the expenses table using the schema in `supabase/schema.sql`:
-   - Use the SQL file in this repository to create the `expenses` table
-   - Or run the SQL commands directly in the Supabase SQL editor
-3. Enable Row Level Security (RLS) if needed for your use case
-4. Add your Supabase URL and anon key to the environment variables
-
-The `lib/supabaseOperations.ts` file contains all the database operations for interacting with the expenses table.
+- Automatic loading of expenses from Supabase when the application starts
+- New expenses (both AI-extracted and manually entered) are immediately saved to the database
+- Updates and deletions are synchronized with the Supabase database
+- The `lib/supabaseOperations.ts` file contains all the database operations for interacting with the expenses table
 
 ## Contributing
 
